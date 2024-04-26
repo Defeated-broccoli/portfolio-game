@@ -81,15 +81,14 @@ export default class Engine {
   }
 
   createLight = () => {
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2)
+    directionalLight.position.set(10, 10, -5)
+
+    directionalLight.castShadow = true
+    this.scene.add(directionalLight)
+
     const ambientLight = new THREE.AmbientLight(0x333333, 2)
     this.scene.add(ambientLight)
-
-    const pointLight = new THREE.PointLight(0xffffff, 1000, 100)
-    pointLight.position.set(0, 20, 0)
-    pointLight.lookAt(0, 0, 0)
-    pointLight.castShadow = true
-    pointLight.shadow.mapSize = new THREE.Vector2(1024 * 2, 1024 * 2)
-    this.scene.add(pointLight)
   }
 
   setWindowResize = (engine: Engine) => {
