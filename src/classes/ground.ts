@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon-es'
 import IUpdatable from '../interfaces/IUpdatable'
+import { settings } from '../utility/settings'
 
 interface GroundProps {
   radius: number
@@ -26,7 +27,12 @@ export default class Ground extends THREE.Mesh implements IUpdatable {
     position = new THREE.Vector3(0, 0, 0),
   }: GroundProps) {
     super(
-      new THREE.CylinderGeometry(radius, radius, height, 256),
+      new THREE.CylinderGeometry(
+        radius,
+        radius,
+        height,
+        settings.ground.segmentCount
+      ),
       new THREE.MeshStandardMaterial({ color: color })
     )
 
@@ -45,7 +51,12 @@ export default class Ground extends THREE.Mesh implements IUpdatable {
     this.body = new CANNON.Body({
       type: CANNON.Body.STATIC,
       position: new CANNON.Vec3(position.x, position.y, position.z),
-      shape: new CANNON.Cylinder(radius, radius, height, 256),
+      shape: new CANNON.Cylinder(
+        radius,
+        radius,
+        height,
+        settings.ground.segmentCount
+      ),
     })
   }
 

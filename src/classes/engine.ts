@@ -5,8 +5,7 @@ import Ground from './ground'
 import Player from './player'
 import IUpdatable from '../interfaces/IUpdatable'
 import Ball from './ball'
-
-const timeStep = 1 / 60
+import { settings } from '../utility/settings'
 
 export default class Engine {
   scene: THREE.Scene
@@ -32,12 +31,12 @@ export default class Engine {
     document.body.appendChild(this.renderer.domElement)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
 
-    this.setCamera(new THREE.Vector3(5, 5, 5))
+    this.setCamera(new THREE.Vector3(0, 5, 5))
     this.setWindowResize(this)
 
     //CANNON
     this.world = new CANNON.World({
-      gravity: new CANNON.Vec3(0, -9.81, 0),
+      gravity: settings.engine.gravity,
     })
   }
 
@@ -61,8 +60,8 @@ export default class Engine {
 
   createGround = (): Ground => {
     const ground = new Ground({
-      radius: 20,
-      height: 1,
+      radius: settings.ground.radius,
+      height: settings.ground.height,
       color: new THREE.Color(0x00ff00),
     })
     this.scene.add(ground)
@@ -72,11 +71,12 @@ export default class Engine {
 
   createPlayer = (): Player => {
     const player = new Player({
-      width: 1,
-      height: 1,
-      depth: 1,
+      width: settings.player.width,
+      height: settings.player.height,
+      depth: settings.player.depth,
       position: new THREE.Vector3(0, 2, 0),
       color: new THREE.Color(0xffff00),
+      world: this.world,
     })
     this.scene.add(player)
     this.world.addBody(player.body)
@@ -86,7 +86,7 @@ export default class Engine {
 
   createBall = (): Ball => {
     const ball = new Ball({
-      radius: 0.5,
+      radius: settings.ball.radius,
       position: new THREE.Vector3(0, 4, 0),
     })
     this.scene.add(ball)
@@ -115,7 +115,7 @@ export default class Engine {
   }
 
   animate = () => {
-    this.world.step(timeStep)
+    this.world.step(settings.engine.timeStep)
 
     this.objectCollection.forEach((obj) => {
       obj.update()

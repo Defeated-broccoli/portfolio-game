@@ -1,18 +1,19 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon-es'
 import IUpdatable from '../interfaces/IUpdatable'
+import { settings } from '../utility/settings'
 
 interface PlayerProps {
   width: number
   height: number
   depth: number
-  color?: THREE.Color
+  readonly color?: THREE.Color
   position?: THREE.Vector3
   velocity?: THREE.Vector3
-}
 
-const playerSpeedVelocity = 3
-const playerJumpVelocity = 10
+  //CANNON
+  world: CANNON.World
+}
 
 export default class Player extends THREE.Mesh implements IUpdatable {
   width: number
@@ -28,6 +29,7 @@ export default class Player extends THREE.Mesh implements IUpdatable {
 
   //CANNON
   body: CANNON.Body
+  world: CANNON.World
 
   //Movement
   keys = {
@@ -56,6 +58,7 @@ export default class Player extends THREE.Mesh implements IUpdatable {
     color = new THREE.Color(0xffff00),
     position = new THREE.Vector3(0, 0, 0),
     velocity = new THREE.Vector3(0, 0, 0),
+    world,
   }: PlayerProps) {
     super(
       new THREE.BoxGeometry(width, height, depth),
@@ -80,10 +83,11 @@ export default class Player extends THREE.Mesh implements IUpdatable {
 
     //CANNON
     this.body = new CANNON.Body({
-      mass: 1,
+      mass: settings.player.mass,
       position: new CANNON.Vec3(position.x, position.y, position.z),
       shape: new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2)),
     })
+    this.world = world
 
     //Movement
     this.velocity = velocity
@@ -112,24 +116,34 @@ export default class Player extends THREE.Mesh implements IUpdatable {
 
   updateVelocity = () => {
     if (this.keys.a.pressed) {
-      this.body.velocity.x = -playerSpeedVelocity
+      this.body.velocity.x = -settings.player.speedVelocity
     } else if (this.keys.d.pressed) {
-      this.body.velocity.x = playerSpeedVelocity
+      this.body.velocity.x = settings.player.speedVelocity
     }
 
     if (this.keys.w.pressed) {
-      this.body.velocity.z = -playerSpeedVelocity
+      this.body.velocity.z = -settings.player.speedVelocity
     } else if (this.keys.s.pressed) {
-      this.body.velocity.z = playerSpeedVelocity
+      this.body.velocity.z = settings.player.speedVelocity
     }
 
-    if (this.keys.space.pressed) {
-      this.body.velocity.y = playerJumpVelocity
+    if (this.keys.space.pressed && this.isOnGround()) {
+      this.body.velocity.y = settings.player.jumpVelocity
     }
+  }
 
-    this.body.position.x += this.velocity.x
-    this.body.position.y += this.velocity.y
-    this.body.position.z += this.velocity.z
+  isOnGround = (): boolean => {
+    const from = this.body.position.clone()
+    const to = new CANNON.Vec3(
+      from.x,
+      from.y - settings.player.jumpRaycastRange,
+      from.z
+    )
+
+    const result = new CANNON.RaycastResult()
+    this.world.rayTest(from, to, result)
+    console.log(result.hasHit)
+    return result.hasHit
   }
 
   setupMovement = () => {
