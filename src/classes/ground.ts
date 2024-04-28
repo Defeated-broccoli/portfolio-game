@@ -10,7 +10,7 @@ interface GroundProps {
   position?: THREE.Vector3
 }
 
-export default class Ground extends THREE.Mesh implements IUpdatable {
+export default class Ground extends THREE.Mesh {
   radius: number
   height: number
   color: THREE.Color
@@ -58,20 +58,5 @@ export default class Ground extends THREE.Mesh implements IUpdatable {
         settings.ground.segmentCount
       ),
     })
-  }
-
-  update = () => {
-    this.updateCollision()
-    this.updateSides()
-  }
-
-  updateSides = () => {
-    this.bottom = this.position.y - this.height / 2
-    this.top = this.position.y + this.height / 2
-  }
-
-  updateCollision = () => {
-    this.position.copy(this.body.position)
-    this.quaternion.copy(this.body.quaternion)
   }
 }
