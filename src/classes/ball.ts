@@ -21,7 +21,7 @@ export default class Ball extends THREE.Mesh implements IUpdatable {
     position = new THREE.Vector3(0, 0, 0),
   }: BallProps) {
     super(
-      new THREE.SphereGeometry(radius),
+      new THREE.SphereGeometry(radius, 64, 64),
       new THREE.MeshStandardMaterial({ color: color })
     )
 
@@ -35,7 +35,7 @@ export default class Ball extends THREE.Mesh implements IUpdatable {
 
     //CANNON
     this.body = new CANNON.Body({
-      mass: 2,
+      mass: 0.2,
       position: new CANNON.Vec3(position.x, position.y, position.z),
       shape: new CANNON.Sphere(radius),
     })

@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import Ground from './ground'
 import Player from './player'
 import IUpdatable from '../interfaces/IUpdatable'
+import Ball from './ball'
 
 const timeStep = 1 / 60
 
@@ -52,10 +53,13 @@ export default class Engine {
     const player = this.createPlayer()
     this.objectCollection.push(player)
 
+    const ball = this.createBall()
+    this.objectCollection.push(ball)
+
     this.createLight()
   }
 
-  createGround = () => {
+  createGround = (): Ground => {
     const ground = new Ground({
       radius: 20,
       height: 1,
@@ -66,7 +70,7 @@ export default class Engine {
     return ground
   }
 
-  createPlayer = () => {
+  createPlayer = (): Player => {
     const player = new Player({
       width: 1,
       height: 1,
@@ -78,6 +82,17 @@ export default class Engine {
     this.world.addBody(player.body)
 
     return player
+  }
+
+  createBall = (): Ball => {
+    const ball = new Ball({
+      radius: 0.5,
+      position: new THREE.Vector3(0, 4, 0),
+    })
+    this.scene.add(ball)
+    this.world.addBody(ball.body)
+
+    return ball
   }
 
   createLight = () => {
