@@ -3,9 +3,9 @@ import * as CANNON from 'cannon-es'
 
 export const settings = {
   player: {
-    speedVelocity: 1.5,
+    speedVelocity: 3,
     jumpVelocity: 10,
-    jumpRaycastRange: 0.5,
+    jumpRaycastRange: 0.7,
     mass: 3,
     width: 1,
     height: 1,
