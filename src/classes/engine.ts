@@ -1,22 +1,26 @@
 import * as THREE from 'three'
 import * as CANNON from 'cannon-es'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+
 import Ground from './ground'
 import Player from './player'
 import IUpdatable from '../interfaces/IUpdatable'
 import Ball from './ball'
 import { settings } from '../utility/settings'
+import Goal from './goal'
 
 export default class Engine {
   scene: THREE.Scene
   camera: THREE.PerspectiveCamera
   renderer: THREE.WebGLRenderer
   controls: OrbitControls
+  loader: GLTFLoader
 
   //CANNON
   world: CANNON.World
 
-  objectCollection: IUpdatable[] = []
+  movableObjects: IUpdatable[] = []
 
   constructor() {
     this.scene = new THREE.Scene()
@@ -34,6 +38,8 @@ export default class Engine {
     this.setCamera(new THREE.Vector3(0, 5, 5))
     this.setWindowResize(this)
 
+    this.loader = new GLTFLoader()
+
     //CANNON
     this.world = new CANNON.World({
       gravity: settings.engine.gravity,
@@ -46,14 +52,15 @@ export default class Engine {
   }
 
   setup = () => {
-    const ground = this.createGround()
-    this.objectCollection.push(ground)
+    this.createGround()
 
     const player = this.createPlayer()
-    this.objectCollection.push(player)
+    this.movableObjects.push(player)
 
     const ball = this.createBall()
-    this.objectCollection.push(ball)
+    this.movableObjects.push(ball)
+
+    const goal = this.createGoal()
 
     this.createLight()
   }
@@ -106,6 +113,16 @@ export default class Engine {
     this.scene.add(ambientLight)
   }
 
+  createGoal = async () => {
+    const goal = new Goal({
+      loader: this.loader,
+      position: new THREE.Vector3(10, 0, 0),
+      orientation: new THREE.Vector3(0, 0, 0),
+    })
+
+    this.scene.add(await goal.loadFile())
+  }
+
   setWindowResize = (engine: Engine) => {
     window.addEventListener('resize', function () {
       engine.camera.aspect = window.innerWidth / window.innerHeight
@@ -117,7 +134,7 @@ export default class Engine {
   animate = () => {
     this.world.step(settings.engine.timeStep)
 
-    this.objectCollection.forEach((obj) => {
+    this.movableObjects.forEach((obj) => {
       obj.update()
     })
 
