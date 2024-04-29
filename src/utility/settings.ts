@@ -25,4 +25,7 @@ export const settings = {
     height: 1,
     segmentCount: 256,
   },
+  goal: {
+    scale: 0.01,
+  },
 }

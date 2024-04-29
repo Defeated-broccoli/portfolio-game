@@ -117,10 +117,10 @@ export default class Engine {
     const goal = new Goal({
       loader: this.loader,
       position: new THREE.Vector3(10, 0, 0),
-      orientation: new THREE.Vector3(0, 0, 0),
+      rotation: new THREE.Euler(0, 0, 0),
     })
 
-    this.scene.add(await goal.loadFile())
+    this.scene.add(goal)
   }
 
   setWindowResize = (engine: Engine) => {

@@ -6,38 +6,39 @@ import { settings } from '../utility/settings'
 interface GoalProps {
   loader: GLTFLoader
   position: THREE.Vector3
-  orientation: THREE.Vector3
+  rotation: THREE.Euler
+  scale?: THREE.Vector3
 }
 
 const goalUrl = new URL('../assets/soccer_goal.glb', import.meta.url)
 
-export default class Goal {
+export default class Goal extends THREE.Group {
   loader: GLTFLoader
-  position: THREE.Vector3
-  orientation: THREE.Vector3
-  gltfScene: THREE.Group<THREE.Object3DEventMap> | undefined
-  constructor({ loader, position, orientation }: GoalProps) {
+  constructor({
+    loader,
+    position,
+    rotation,
+    scale = new THREE.Vector3(
+      settings.goal.scale,
+      settings.goal.scale,
+      settings.goal.scale
+    ),
+  }: GoalProps) {
+    super()
+
     this.loader = loader
-    this.position = position
-    this.orientation = orientation
+    this.position.set(position.x, position.y, position.z)
+    this.rotation.set(rotation.x, rotation.y, rotation.z)
+    this.scale.set(scale.x, scale.y, scale.z)
+
+    this.loadFile()
   }
 
   loadFile = async () => {
-    const goal = await this.loader.loadAsync(goalUrl.href)
-    this.gltfScene = goal.scene
-    this.gltfScene.position.set(
-      this.position.x,
-      this.position.y,
-      this.position.z
-    )
-    this.gltfScene.quaternion.set(
-      this.orientation.x,
-      this.orientation.y,
-      this.orientation.z,
-      0
-    )
+    const goal = await this.loader
+      .loadAsync(goalUrl.href)
+      .then((gltf) => gltf.scene)
 
-    this.gltfScene.scale.set(0.01, 0.01, 0.01)
-    return goal.scene
+    this.add(goal)
   }
 }
