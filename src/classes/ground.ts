@@ -8,7 +8,10 @@ interface GroundProps {
   height: number
   color: THREE.Color
   position?: THREE.Vector3
+  textureLoader: THREE.TextureLoader
 }
+
+const groundTexture = new URL('../assets/ground-texture.png', import.meta.url)
 
 export default class Ground extends THREE.Mesh {
   radius: number
@@ -16,6 +19,8 @@ export default class Ground extends THREE.Mesh {
   color: THREE.Color
   bottom: number
   top: number
+
+  textureLoader: THREE.TextureLoader
 
   //CANNON
   body: CANNON.Body
@@ -25,6 +30,7 @@ export default class Ground extends THREE.Mesh {
     height,
     color,
     position = new THREE.Vector3(0, 0, 0),
+    textureLoader,
   }: GroundProps) {
     super(
       new THREE.CylinderGeometry(
@@ -47,6 +53,9 @@ export default class Ground extends THREE.Mesh {
     this.bottom = this.position.y - this.height / 2
     this.top = this.position.y + this.height / 2
 
+    this.textureLoader = textureLoader
+    this.loadTexture()
+
     //CANNON
     this.body = new CANNON.Body({
       type: CANNON.Body.STATIC,
@@ -58,5 +67,17 @@ export default class Ground extends THREE.Mesh {
         settings.ground.segmentCount
       ),
     })
+  }
+
+  loadTexture = async () => {
+    this.textureLoader
+      .loadAsync(groundTexture.href)
+      .then((texture) => {
+        const mat = new THREE.MeshStandardMaterial({ map: texture })
+        this.material = mat
+      })
+      .catch((e) => {
+        console.log(e)
+      })
   }
 }

@@ -15,7 +15,8 @@ export default class Engine {
   camera: THREE.PerspectiveCamera
   renderer: THREE.WebGLRenderer
   controls: OrbitControls
-  loader: GLTFLoader
+  gltfLoader: GLTFLoader
+  textureLoader: THREE.TextureLoader
 
   //CANNON
   world: CANNON.World
@@ -38,7 +39,8 @@ export default class Engine {
     this.setCamera(new THREE.Vector3(0, 5, 5))
     this.setWindowResize(this)
 
-    this.loader = new GLTFLoader()
+    this.gltfLoader = new GLTFLoader()
+    this.textureLoader = new THREE.TextureLoader()
 
     //CANNON
     this.world = new CANNON.World({
@@ -78,6 +80,7 @@ export default class Engine {
       radius: settings.ground.radius,
       height: settings.ground.height,
       color: new THREE.Color(0x00ff00),
+      textureLoader: this.textureLoader,
     })
     this.scene.add(ground)
     this.world.addBody(ground.body)
@@ -126,7 +129,7 @@ export default class Engine {
     numberOfGoals: number,
     size: THREE.Vector3
   ) => {
-    const radius = ground.radius - size.x
+    const radius = ground.radius - size.x - settings.goal.marginWidth
     for (let i = 0; i < numberOfGoals; i++) {
       const angle = (i / numberOfGoals) * Math.PI * 2
       const x = radius * Math.cos(angle) + ground.position.x
@@ -134,7 +137,7 @@ export default class Engine {
       const y = ground.top
 
       const goal = new Goal({
-        loader: this.loader,
+        loader: this.gltfLoader,
         position: new THREE.Vector3(x, y, z),
         rotation: new THREE.Euler(0, Math.PI - angle, 0),
         size: size,
