@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import * as CANNON from 'cannon-es'
 import { settings } from '../utility/settings'
+import IUpdatable from '../interfaces/IUpdatable'
 
 interface GoalProps {
   loader: GLTFLoader
@@ -12,9 +13,13 @@ interface GoalProps {
 
 const goalUrl = new URL('../assets/soccer_goal.glb', import.meta.url)
 
-export default class Goal extends THREE.Group {
+export default class Goal extends THREE.Group implements IUpdatable {
   loader: GLTFLoader
   size: THREE.Vector3
+
+  //CANNON
+  body: CANNON.Body
+
   constructor({ loader, position, rotation, size }: GoalProps) {
     super()
 
@@ -24,6 +29,9 @@ export default class Goal extends THREE.Group {
     this.rotation.set(rotation.x, rotation.y, rotation.z)
 
     this.loadFile()
+
+    //CANNON
+    this.body = this.createBody()
   }
 
   loadFile = async () => {
@@ -41,5 +49,28 @@ export default class Goal extends THREE.Group {
     )
 
     this.add(goal)
+  }
+
+  createBody = () => {
+    const topBar = new CANNON.Body({
+      type: CANNON.BODY_TYPES.STATIC,
+      shape: new CANNON.Cylinder(1, 1, this.size.x),
+      position: new CANNON.Vec3(
+        this.position.x,
+        this.position.y + this.size.y - 0.05
+      ),
+      //quaternion: new CANNON.Quaternion().setFromEuler(0, 0, 0),
+    })
+
+    return topBar
+  }
+
+  update = () => {
+    //this.updateCollision()
+  }
+
+  updateCollision = () => {
+    this.position.copy(this.body.position)
+    this.quaternion.copy(this.body.quaternion)
   }
 }

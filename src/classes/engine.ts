@@ -10,6 +10,8 @@ import Ball from './ball'
 import { settings } from '../utility/settings'
 import Goal from './goal'
 
+import CannonDebugger from 'cannon-es-debugger'
+
 export default class Engine {
   scene: THREE.Scene
   camera: THREE.PerspectiveCamera
@@ -20,6 +22,8 @@ export default class Engine {
 
   //CANNON
   world: CANNON.World
+
+  cannonDebugRenderer: any
 
   movableObjects: IUpdatable[] = []
 
@@ -46,6 +50,11 @@ export default class Engine {
     this.world = new CANNON.World({
       gravity: settings.engine.gravity,
     })
+
+    this.cannonDebugRenderer = new (CannonDebugger as any)(
+      this.scene,
+      this.world
+    )
   }
 
   setCamera = (position: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) => {
@@ -143,6 +152,10 @@ export default class Engine {
         size: size,
       })
       this.scene.add(goal)
+      this.world.addBody(goal.body)
+      this.movableObjects.push(goal)
+
+      console.log(goal.body)
     }
   }
 
@@ -160,6 +173,8 @@ export default class Engine {
     this.movableObjects.forEach((obj) => {
       obj.update()
     })
+
+    if (settings.debug.cannonDebugger) this.cannonDebugRenderer.update()
 
     requestAnimationFrame(this.animate)
     this.renderer.render(this.scene, this.camera)

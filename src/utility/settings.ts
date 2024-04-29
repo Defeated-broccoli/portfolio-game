@@ -3,13 +3,13 @@ import * as CANNON from 'cannon-es'
 
 export const settings = {
   player: {
-    speedVelocity: 3,
+    speedVelocity: 1,
     jumpVelocity: 10,
     jumpRaycastRange: 0.7,
     mass: 3,
-    width: 1,
-    height: 1,
-    depth: 1,
+    width: 0.3,
+    height: 0.3,
+    depth: 0.3,
   },
   engine: {
     gravity: new CANNON.Vec3(0, -9.81, 0),
@@ -32,5 +32,8 @@ export const settings = {
     height: 3,
     depth: 2,
     marginWidth: 2.2,
+  },
+  debug: {
+    cannonDebugger: true,
   },
 }
