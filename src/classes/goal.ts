@@ -7,29 +7,21 @@ interface GoalProps {
   loader: GLTFLoader
   position: THREE.Vector3
   rotation: THREE.Euler
-  scale?: THREE.Vector3
+  size: THREE.Vector3
 }
 
 const goalUrl = new URL('../assets/soccer_goal.glb', import.meta.url)
 
 export default class Goal extends THREE.Group {
   loader: GLTFLoader
-  constructor({
-    loader,
-    position,
-    rotation,
-    scale = new THREE.Vector3(
-      settings.goal.scale,
-      settings.goal.scale,
-      settings.goal.scale
-    ),
-  }: GoalProps) {
+  size: THREE.Vector3
+  constructor({ loader, position, rotation, size }: GoalProps) {
     super()
 
     this.loader = loader
+    this.size = size
     this.position.set(position.x, position.y, position.z)
     this.rotation.set(rotation.x, rotation.y, rotation.z)
-    this.scale.set(scale.x, scale.y, scale.z)
 
     this.loadFile()
   }
@@ -38,6 +30,15 @@ export default class Goal extends THREE.Group {
     const goal = await this.loader
       .loadAsync(goalUrl.href)
       .then((gltf) => gltf.scene)
+
+    const boundingBox = new THREE.Box3().setFromObject(goal)
+    const goalSize = boundingBox.getSize(new THREE.Vector3())
+
+    goal.scale.set(
+      this.size.x / goalSize.x,
+      this.size.y / goalSize.y,
+      this.size.z / goalSize.z
+    )
 
     this.add(goal)
   }

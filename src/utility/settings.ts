@@ -27,5 +27,9 @@ export const settings = {
   },
   goal: {
     scale: 0.01,
+    numberOfGoals: 3,
+    width: 10,
+    height: 8,
+    depth: 6,
   },
 }

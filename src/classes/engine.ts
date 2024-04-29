@@ -52,7 +52,7 @@ export default class Engine {
   }
 
   setup = () => {
-    this.createGround()
+    const ground = this.createGround()
 
     const player = this.createPlayer()
     this.movableObjects.push(player)
@@ -60,7 +60,15 @@ export default class Engine {
     const ball = this.createBall()
     this.movableObjects.push(ball)
 
-    const goal = this.createGoal()
+    this.createGoals(
+      ground,
+      settings.goal.numberOfGoals,
+      new THREE.Vector3(
+        settings.goal.depth,
+        settings.goal.height,
+        settings.goal.width
+      )
+    )
 
     this.createLight()
   }
@@ -113,14 +121,26 @@ export default class Engine {
     this.scene.add(ambientLight)
   }
 
-  createGoal = async () => {
-    const goal = new Goal({
-      loader: this.loader,
-      position: new THREE.Vector3(10, 0, 0),
-      rotation: new THREE.Euler(0, 0, 0),
-    })
+  createGoals = async (
+    ground: Ground,
+    numberOfGoals: number,
+    size: THREE.Vector3
+  ) => {
+    const radius = ground.radius - size.x
+    for (let i = 0; i < numberOfGoals; i++) {
+      const angle = (i / numberOfGoals) * Math.PI * 2
+      const x = radius * Math.cos(angle) + ground.position.x
+      const z = radius * Math.sin(angle) + ground.position.z
+      const y = ground.top
 
-    this.scene.add(goal)
+      const goal = new Goal({
+        loader: this.loader,
+        position: new THREE.Vector3(x, y, z),
+        rotation: new THREE.Euler(0, Math.PI - angle, 0),
+        size: size,
+      })
+      this.scene.add(goal)
+    }
   }
 
   setWindowResize = (engine: Engine) => {
