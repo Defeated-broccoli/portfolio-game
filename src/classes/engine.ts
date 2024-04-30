@@ -82,6 +82,8 @@ export default class Engine {
     )
 
     this.createLight()
+
+    this.addHelpers()
   }
 
   createGround = (): Ground => {
@@ -138,7 +140,7 @@ export default class Engine {
     numberOfGoals: number,
     size: THREE.Vector3
   ) => {
-    const radius = ground.radius - size.x - settings.goal.marginWidth
+    const radius = ground.radius - size.x - settings.goal.marginOffset
     for (let i = 0; i < numberOfGoals; i++) {
       const angle = (i / numberOfGoals) * Math.PI * 2
       const x = radius * Math.cos(angle) + ground.position.x
@@ -152,11 +154,21 @@ export default class Engine {
         size: size,
       })
       this.scene.add(goal)
-      this.world.addBody(goal.body)
+
+      goal.bodies.forEach((body) => {
+        this.world.addBody(body)
+      })
+
       this.movableObjects.push(goal)
 
-      console.log(goal.body)
+      console.log(goal.rotation.y)
     }
+  }
+
+  addHelpers = () => {
+    const axisHelper = new THREE.AxesHelper(5)
+    this.scene.add(axisHelper)
+    axisHelper.position.y = 2
   }
 
   setWindowResize = (engine: Engine) => {

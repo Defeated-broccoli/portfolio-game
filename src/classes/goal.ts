@@ -18,7 +18,7 @@ export default class Goal extends THREE.Group implements IUpdatable {
   size: THREE.Vector3
 
   //CANNON
-  body: CANNON.Body
+  bodies: CANNON.Body[]
 
   constructor({ loader, position, rotation, size }: GoalProps) {
     super()
@@ -31,7 +31,7 @@ export default class Goal extends THREE.Group implements IUpdatable {
     this.loadFile()
 
     //CANNON
-    this.body = this.createBody()
+    this.bodies = this.createBody()
   }
 
   loadFile = async () => {
@@ -52,17 +52,72 @@ export default class Goal extends THREE.Group implements IUpdatable {
   }
 
   createBody = () => {
+    let bodies: CANNON.Body[] = []
+
     const topBar = new CANNON.Body({
       type: CANNON.BODY_TYPES.STATIC,
-      shape: new CANNON.Cylinder(1, 1, this.size.x),
+      shape: new CANNON.Cylinder(
+        settings.goal.height * 0.04,
+        settings.goal.height * 0.04,
+        this.size.z * settings.goal.collisionBoxMultiplayer
+      ),
       position: new CANNON.Vec3(
         this.position.x,
-        this.position.y + this.size.y - 0.05
+        this.position.y + this.size.y - 0.2,
+        this.position.z
       ),
-      //quaternion: new CANNON.Quaternion().setFromEuler(0, 0, 0),
+      quaternion: new CANNON.Quaternion().setFromEuler(
+        Math.PI / 2,
+        0,
+        this.rotation.y * 2
+      ),
     })
 
-    return topBar
+    bodies.push(topBar)
+
+    const leftBar = new CANNON.Body({
+      type: CANNON.BODY_TYPES.STATIC,
+      shape: new CANNON.Cylinder(
+        settings.goal.width * 0.03,
+        settings.goal.width * 0.03,
+        this.size.y * settings.goal.collisionBoxMultiplayer
+      ),
+      position: new CANNON.Vec3(
+        this.position.x +
+          ((this.size.z * settings.goal.collisionBoxMultiplayer) / 2) *
+            Math.sin(this.rotation.y),
+        this.position.y + this.size.y / 2,
+        this.position.z +
+          ((this.size.z * settings.goal.collisionBoxMultiplayer) / 2) *
+            Math.cos(this.rotation.y)
+      ),
+      quaternion: new CANNON.Quaternion().setFromEuler(0, 0, 0),
+    })
+
+    bodies.push(leftBar)
+
+    const rightBar = new CANNON.Body({
+      type: CANNON.BODY_TYPES.STATIC,
+      shape: new CANNON.Cylinder(
+        settings.goal.width * 0.03,
+        settings.goal.width * 0.03,
+        this.size.y * settings.goal.collisionBoxMultiplayer
+      ),
+      position: new CANNON.Vec3(
+        this.position.x -
+          ((this.size.z * settings.goal.collisionBoxMultiplayer) / 2) *
+            Math.sin(this.rotation.y),
+        this.position.y + this.size.y / 2,
+        this.position.z -
+          ((this.size.z * settings.goal.collisionBoxMultiplayer) / 2) *
+            Math.cos(this.rotation.y)
+      ),
+      quaternion: new CANNON.Quaternion().setFromEuler(0, 0, 0),
+    })
+
+    bodies.push(rightBar)
+
+    return bodies
   }
 
   update = () => {
@@ -70,7 +125,9 @@ export default class Goal extends THREE.Group implements IUpdatable {
   }
 
   updateCollision = () => {
-    this.position.copy(this.body.position)
-    this.quaternion.copy(this.body.quaternion)
+    this.bodies.forEach((body) => {
+      this.position.copy(body.position)
+      this.quaternion.copy(body.quaternion)
+    })
   }
 }

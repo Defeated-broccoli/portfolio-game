@@ -26,12 +26,12 @@ export const settings = {
     segmentCount: 256,
   },
   goal: {
-    scale: 0.01,
     numberOfGoals: 3,
     width: 6.2,
     height: 3,
     depth: 2,
-    marginWidth: 2.2,
+    marginOffset: 2.2,
+    collisionBoxMultiplayer: 0.88,
   },
   debug: {
     cannonDebugger: true,
