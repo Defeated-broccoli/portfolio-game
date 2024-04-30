@@ -140,7 +140,7 @@ export default class Engine {
     numberOfGoals: number,
     size: THREE.Vector3
   ) => {
-    const radius = ground.radius - size.x - settings.goal.marginOffset
+    const radius = ground.radius - size.x - settings.ground.radius * 0.11
     for (let i = 0; i < numberOfGoals; i++) {
       const angle = (i / numberOfGoals) * Math.PI * 2
       const x = radius * Math.cos(angle) + ground.position.x

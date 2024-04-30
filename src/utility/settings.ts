@@ -30,7 +30,6 @@ export const settings = {
     width: 6.2,
     height: 3,
     depth: 2,
-    marginOffset: 2.2,
     collisionBoxMultiplayer: 0.88,
   },
   debug: {
