@@ -21,15 +21,12 @@ export const settings = {
     segmentCount: 64,
   },
   ground: {
-    radius: 20,
+    radius: 50,
     height: 1,
     segmentCount: 256,
   },
   goal: {
     numberOfGoals: 3,
-    width: 6.2,
-    height: 3,
-    depth: 2,
     collisionBoxMultiplayer: 0.88,
   },
   debug: {

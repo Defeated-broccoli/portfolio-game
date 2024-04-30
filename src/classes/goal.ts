@@ -57,8 +57,8 @@ export default class Goal extends THREE.Group implements IUpdatable {
     const topBar = new CANNON.Body({
       type: CANNON.BODY_TYPES.STATIC,
       shape: new CANNON.Cylinder(
-        settings.goal.height * 0.04,
-        settings.goal.height * 0.04,
+        this.size.y * 0.04,
+        this.size.y * 0.04,
         this.size.z * settings.goal.collisionBoxMultiplayer
       ),
       position: new CANNON.Vec3(
@@ -78,8 +78,8 @@ export default class Goal extends THREE.Group implements IUpdatable {
     const leftBar = new CANNON.Body({
       type: CANNON.BODY_TYPES.STATIC,
       shape: new CANNON.Cylinder(
-        settings.goal.width * 0.03,
-        settings.goal.width * 0.03,
+        this.size.z * 0.03,
+        this.size.z * 0.03,
         this.size.y * settings.goal.collisionBoxMultiplayer
       ),
       position: new CANNON.Vec3(
@@ -99,8 +99,8 @@ export default class Goal extends THREE.Group implements IUpdatable {
     const rightBar = new CANNON.Body({
       type: CANNON.BODY_TYPES.STATIC,
       shape: new CANNON.Cylinder(
-        settings.goal.width * 0.03,
-        settings.goal.width * 0.03,
+        this.size.z * 0.03,
+        this.size.z * 0.03,
         this.size.y * settings.goal.collisionBoxMultiplayer
       ),
       position: new CANNON.Vec3(

@@ -75,9 +75,9 @@ export default class Engine {
       ground,
       settings.goal.numberOfGoals,
       new THREE.Vector3(
-        settings.goal.depth,
-        settings.goal.height,
-        settings.goal.width
+        settings.ground.radius * 0.1,
+        settings.ground.radius * 0.16,
+        settings.ground.radius * 0.32
       )
     )
 
