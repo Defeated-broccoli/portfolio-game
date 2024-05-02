@@ -96,6 +96,7 @@ export default class Ground extends THREE.Mesh {
         this.height,
         settings.ground.segmentCount
       ),
+      material: new CANNON.Material(),
     })
 
     this.world.addBody(body)

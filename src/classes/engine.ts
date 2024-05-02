@@ -79,6 +79,15 @@ export default class Engine {
     this.createWall(ground)
 
     this.addHelpers()
+
+    this.addContactMaterial(ball.body, ground.body, {
+      restitution: 0.7,
+      friction: 0.3,
+    })
+    this.addContactMaterial(ball.body, player.body, {
+      restitution: 0.5,
+      friction: 0.2,
+    })
   }
 
   createGround = (): Ground => {
@@ -168,6 +177,27 @@ export default class Engine {
     const axisHelper = new THREE.AxesHelper(5)
     this.scene.add(axisHelper)
     axisHelper.position.y = 2
+  }
+
+  addContactMaterial = (
+    object1: CANNON.Body,
+    object2: CANNON.Body,
+    props: {
+      restitution: number
+      friction: number
+    }
+  ) => {
+    if (object1.material && object2.material) {
+      const contactMat = new CANNON.ContactMaterial(
+        object1.material,
+        object2.material,
+        {
+          ...props,
+        }
+      )
+      this.world.addContactMaterial(contactMat)
+      return contactMat
+    } else console.error('')
   }
 
   setWindowResize = (engine: Engine) => {

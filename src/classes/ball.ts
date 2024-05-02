@@ -59,6 +59,7 @@ export default class Ball extends THREE.Mesh implements IUpdatable {
       mass: settings.ball.mass,
       position: new CANNON.Vec3(position.x, position.y, position.z),
       shape: new CANNON.Sphere(radius),
+      material: new CANNON.Material(),
     })
     this.world.addBody(this.body)
   }

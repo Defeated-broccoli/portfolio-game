@@ -108,6 +108,7 @@ export default class Player extends THREE.Mesh implements IUpdatable {
       shape: new CANNON.Box(
         new CANNON.Vec3(this.width / 2, this.height / 2, this.depth / 2)
       ),
+      material: new CANNON.Material(),
     })
     this.world.addBody(body)
     return body
@@ -117,6 +118,8 @@ export default class Player extends THREE.Mesh implements IUpdatable {
     this.updateCollision()
     this.updateSides()
     this.updateVelocity()
+
+    this.handleOffBordersPosition()
   }
 
   updateSides = () => {
@@ -148,6 +151,12 @@ export default class Player extends THREE.Mesh implements IUpdatable {
 
     if (this.keys.space.pressed && this.isOnGround()) {
       this.body.velocity.y = settings.player.jumpVelocity
+    }
+  }
+
+  handleOffBordersPosition = () => {
+    if (this.position.y < -2) {
+      this.body.position.set(0, 1, 0)
     }
   }
 
