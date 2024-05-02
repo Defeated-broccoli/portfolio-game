@@ -10,6 +10,7 @@ interface PlayerProps {
   readonly color?: THREE.Color
   position?: THREE.Vector3
   velocity?: THREE.Vector3
+  scene: THREE.Scene
 
   //CANNON
   world: CANNON.World
@@ -26,6 +27,8 @@ export default class Player extends THREE.Mesh implements IUpdatable {
   right: number
   front: number
   back: number
+
+  scene: THREE.Scene
 
   //CANNON
   body: CANNON.Body
@@ -59,6 +62,7 @@ export default class Player extends THREE.Mesh implements IUpdatable {
     position = new THREE.Vector3(0, 0, 0),
     velocity = new THREE.Vector3(0, 0, 0),
     world,
+    scene,
   }: PlayerProps) {
     super(
       new THREE.BoxGeometry(width, height, depth),
@@ -81,17 +85,32 @@ export default class Player extends THREE.Mesh implements IUpdatable {
     this.front = this.position.z - this.depth / 2
     this.back = this.position.z + this.depth / 2
 
+    this.scene = scene
+    this.scene.add(this)
+
     //CANNON
-    this.body = new CANNON.Body({
-      mass: settings.player.mass,
-      position: new CANNON.Vec3(position.x, position.y, position.z),
-      shape: new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2)),
-    })
     this.world = world
+    this.body = this.createBody()
 
     //Movement
     this.velocity = velocity
     this.setupMovement()
+  }
+
+  createBody = () => {
+    const body = new CANNON.Body({
+      mass: settings.player.mass,
+      position: new CANNON.Vec3(
+        this.position.x,
+        this.position.y,
+        this.position.z
+      ),
+      shape: new CANNON.Box(
+        new CANNON.Vec3(this.width / 2, this.height / 2, this.depth / 2)
+      ),
+    })
+    this.world.addBody(body)
+    return body
   }
 
   update = () => {

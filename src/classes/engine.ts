@@ -11,6 +11,7 @@ import { settings } from '../utility/settings'
 import Goal from './goal'
 
 import CannonDebugger from 'cannon-es-debugger'
+import Wall from './wall'
 
 export default class Engine {
   scene: THREE.Scene
@@ -68,20 +69,14 @@ export default class Engine {
     const player = this.createPlayer()
     this.movableObjects.push(player)
 
-    const ball = this.createBall()
+    const ball = this.createBall(ground)
     this.movableObjects.push(ball)
 
-    this.createGoals(
-      ground,
-      settings.goal.numberOfGoals,
-      new THREE.Vector3(
-        settings.ground.radius * 0.1,
-        settings.ground.radius * 0.16,
-        settings.ground.radius * 0.32
-      )
-    )
+    this.createGoals(ground)
 
     this.createLight()
+
+    this.createWall(ground)
 
     this.addHelpers()
   }
@@ -92,9 +87,9 @@ export default class Engine {
       height: settings.ground.height,
       color: new THREE.Color(0x00ff00),
       textureLoader: this.textureLoader,
+      world: this.world,
+      scene: this.scene,
     })
-    this.scene.add(ground)
-    this.world.addBody(ground.body)
     return ground
   }
 
@@ -106,21 +101,19 @@ export default class Engine {
       position: new THREE.Vector3(0, 2, 0),
       color: new THREE.Color(0xffff00),
       world: this.world,
+      scene: this.scene,
     })
-    this.scene.add(player)
-    this.world.addBody(player.body)
-
     return player
   }
 
-  createBall = (): Ball => {
+  createBall = (ground: Ground): Ball => {
     const ball = new Ball({
       radius: settings.ball.radius,
       position: new THREE.Vector3(0, 4, 0),
+      ground: ground,
+      world: this.world,
+      scene: this.scene,
     })
-    this.scene.add(ball)
-    this.world.addBody(ball.body)
-
     return ball
   }
 
@@ -135,11 +128,14 @@ export default class Engine {
     this.scene.add(ambientLight)
   }
 
-  createGoals = async (
-    ground: Ground,
-    numberOfGoals: number,
-    size: THREE.Vector3
-  ) => {
+  createGoals = async (ground: Ground) => {
+    const numberOfGoals = settings.goal.numberOfGoals
+    const size = new THREE.Vector3(
+      settings.ground.radius * 0.1,
+      settings.ground.radius * 0.16,
+      settings.ground.radius * 0.32
+    )
+
     const radius = ground.radius - size.x - settings.ground.radius * 0.11
     for (let i = 0; i < numberOfGoals; i++) {
       const angle = (i / numberOfGoals) * Math.PI * 2
@@ -152,17 +148,20 @@ export default class Engine {
         position: new THREE.Vector3(x, y, z),
         rotation: new THREE.Euler(0, Math.PI - angle, 0),
         size: size,
+        world: this.world,
+        scene: this.scene,
       })
-      this.scene.add(goal)
-
-      goal.bodies.forEach((body) => {
-        this.world.addBody(body)
-      })
-
-      this.movableObjects.push(goal)
-
-      console.log(goal.rotation.y)
     }
+  }
+
+  createWall = (ground: Ground) => {
+    const wall = new Wall({
+      radius: ground.radius,
+      height: 50,
+      position: new THREE.Vector3(0, 0, 0),
+      scene: this.scene,
+      world: this.world,
+    })
   }
 
   addHelpers = () => {

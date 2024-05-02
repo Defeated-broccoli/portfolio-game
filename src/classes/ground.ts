@@ -9,6 +9,8 @@ interface GroundProps {
   color: THREE.Color
   position?: THREE.Vector3
   textureLoader: THREE.TextureLoader
+  world: CANNON.World
+  scene: THREE.Scene
 }
 
 const groundTexture = new URL('../assets/ground-texture.png', import.meta.url)
@@ -20,10 +22,12 @@ export default class Ground extends THREE.Mesh {
   bottom: number
   top: number
 
+  scene: THREE.Scene
   textureLoader: THREE.TextureLoader
 
   //CANNON
   body: CANNON.Body
+  world: CANNON.World
 
   constructor({
     radius,
@@ -31,6 +35,8 @@ export default class Ground extends THREE.Mesh {
     color,
     position = new THREE.Vector3(0, 0, 0),
     textureLoader,
+    world,
+    scene,
   }: GroundProps) {
     super(
       new THREE.CylinderGeometry(
@@ -53,20 +59,15 @@ export default class Ground extends THREE.Mesh {
     this.bottom = this.position.y - this.height / 2
     this.top = this.position.y + this.height / 2
 
+    this.scene = scene
+    this.scene.add(this)
+
     this.textureLoader = textureLoader
     this.loadTexture()
 
     //CANNON
-    this.body = new CANNON.Body({
-      type: CANNON.Body.STATIC,
-      position: new CANNON.Vec3(position.x, position.y, position.z),
-      shape: new CANNON.Cylinder(
-        radius,
-        radius,
-        height,
-        settings.ground.segmentCount
-      ),
-    })
+    this.world = world
+    this.body = this.createBody()
   }
 
   loadTexture = async () => {
@@ -79,5 +80,25 @@ export default class Ground extends THREE.Mesh {
       .catch((e) => {
         console.log(e)
       })
+  }
+
+  createBody = () => {
+    const body = new CANNON.Body({
+      type: CANNON.Body.STATIC,
+      position: new CANNON.Vec3(
+        this.position.x,
+        this.position.y,
+        this.position.z
+      ),
+      shape: new CANNON.Cylinder(
+        this.radius,
+        this.radius,
+        this.height,
+        settings.ground.segmentCount
+      ),
+    })
+
+    this.world.addBody(body)
+    return body
   }
 }
