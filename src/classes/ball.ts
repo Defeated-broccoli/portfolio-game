@@ -60,6 +60,7 @@ export default class Ball extends THREE.Mesh implements IUpdatable {
       position: new CANNON.Vec3(position.x, position.y, position.z),
       shape: new CANNON.Sphere(radius),
     })
+    this.world.addBody(this.body)
   }
 
   update = () => {
