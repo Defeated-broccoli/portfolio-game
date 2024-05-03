@@ -129,9 +129,20 @@ export default class Engine {
 
   createLight = () => {
     const directionalLight = new THREE.DirectionalLight(0xffffff, 2)
-    directionalLight.position.set(10, 10, -5)
+    directionalLight.position.set(100, 100, -50)
 
     directionalLight.castShadow = true
+    directionalLight.shadow.bias = 0.0001
+
+    directionalLight.shadow.mapSize = new THREE.Vector2(1024 * 2, 1024 * 2)
+
+    const groundRadius = settings.ground.radius
+
+    directionalLight.shadow.camera.left = -groundRadius
+    directionalLight.shadow.camera.right = groundRadius
+    directionalLight.shadow.camera.top = groundRadius
+    directionalLight.shadow.camera.bottom = -groundRadius
+
     this.scene.add(directionalLight)
 
     const ambientLight = new THREE.AmbientLight(0x333333, 2)

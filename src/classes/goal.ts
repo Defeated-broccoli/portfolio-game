@@ -55,6 +55,9 @@ export default class Goal extends THREE.Group implements IUpdatable {
       this.size.z / goalSize.z
     )
 
+    Goal.setCastShadow(goal, true)
+
+    console.log(goal)
     this.add(goal)
   }
 
@@ -119,6 +122,16 @@ export default class Goal extends THREE.Group implements IUpdatable {
     this.world.addBody(body)
 
     return body
+  }
+
+  static setCastShadow = (
+    object: THREE.Group<THREE.Object3DEventMap>,
+    shadow: boolean
+  ) => {
+    object.traverse((child) => {
+      child.castShadow = shadow
+      //child.receiveShadow = shadow
+    })
   }
 
   update = () => {
