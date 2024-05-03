@@ -11,7 +11,13 @@ interface BallProps {
   ground: Ground
   scene: THREE.Scene
   world: CANNON.World
+  textureLoader: THREE.TextureLoader
 }
+
+const soccerBallTexture = new URL(
+  '../assets/soccer-ball-texture.png',
+  import.meta.url
+)
 
 export default class Ball extends THREE.Mesh implements IUpdatable {
   radius: number
@@ -19,6 +25,7 @@ export default class Ball extends THREE.Mesh implements IUpdatable {
   position: THREE.Vector3
   ground: Ground
   scene: THREE.Scene
+  textureLoader: THREE.TextureLoader
 
   //CANNON
   body: CANNON.Body
@@ -31,6 +38,7 @@ export default class Ball extends THREE.Mesh implements IUpdatable {
     ground,
     scene,
     world,
+    textureLoader,
   }: BallProps) {
     super(
       new THREE.SphereGeometry(
@@ -53,6 +61,9 @@ export default class Ball extends THREE.Mesh implements IUpdatable {
     this.scene = scene
     this.scene.add(this)
 
+    this.textureLoader = textureLoader
+    this.loadTexture()
+
     //CANNON
     this.world = world
     this.body = new CANNON.Body({
@@ -62,6 +73,18 @@ export default class Ball extends THREE.Mesh implements IUpdatable {
       material: new CANNON.Material(),
     })
     this.world.addBody(this.body)
+  }
+
+  loadTexture = async () => {
+    this.textureLoader
+      .loadAsync(soccerBallTexture.href)
+      .then((texture) => {
+        const mat = new THREE.MeshStandardMaterial({ map: texture })
+        this.material = mat
+      })
+      .catch((e) => {
+        console.log(e)
+      })
   }
 
   update = () => {

@@ -122,6 +122,7 @@ export default class Engine {
       ground: ground,
       world: this.world,
       scene: this.scene,
+      textureLoader: this.textureLoader,
     })
     return ball
   }
